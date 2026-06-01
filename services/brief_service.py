@@ -59,12 +59,12 @@ class BriefService:
         if work_events:
 
             start = min(
-                event["time"]
+                event["start_time"]
                 for event in work_events
             )
 
             finish = max(
-                event["time"]
+                event["end_time"]
                 for event in work_events
             )
 
