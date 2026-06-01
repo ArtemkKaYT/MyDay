@@ -37,7 +37,8 @@ class ScheduleService:
             end_time,
             event_type,
             event_date=None,
-            repeat="none"
+            repeat_type=None,
+            repeat_interval=None
         ):
 
         schedule = self.load_schedule()
@@ -51,7 +52,8 @@ class ScheduleService:
             "start_time": start_time,
             "end_time": end_time,
             "type": event_type,
-            "repeat": repeat
+            "repeat_type": repeat_type,
+            "repeat_interval": repeat_interval
         }
 
         schedule.append(new_event)
