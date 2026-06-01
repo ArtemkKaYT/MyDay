@@ -22,7 +22,7 @@ class BriefService:
             if weather_type in WEATHER_MESSAGES:
                 parts.append(
                     choice(
-                        self.WEATHER_MESSAGES[weather_type]
+                        WEATHER_MESSAGES[weather_type]
                     )
                 )
 
