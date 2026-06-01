@@ -19,5 +19,5 @@ class WeatherService:
             response.raise_for_status()
             return response.json()
 
-        except requests.exceptions.RequestException as e:
-            return e
+        except requests.exceptions.RequestException:
+            return None
