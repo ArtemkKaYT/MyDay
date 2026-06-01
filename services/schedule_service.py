@@ -33,11 +33,12 @@ class ScheduleService:
     def add_event(
             self,
             title,
-            event_time,
+            start_time,
+            end_time,
             event_type,
             event_date=None,
             repeat="none"
-    ):
+        ):
 
         schedule = self.load_schedule()
 
@@ -47,7 +48,8 @@ class ScheduleService:
         new_event = {
             "title": title,
             "date": event_date,
-            "time": event_time,
+            "start_time": start_time,
+            "end_time": end_time,
             "type": event_type,
             "repeat": repeat
         }
