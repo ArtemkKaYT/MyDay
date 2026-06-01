@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from datetime import date
+from datetime import date, datetime
 
 
 class ScheduleService:
@@ -72,12 +72,53 @@ class ScheduleService:
 
         return self.load_schedule()
 
+    def should_show_event(self, event, target_date_obj):
+
+        try:
+            event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
+        except (KeyError, ValueError):
+            return False
+
+        if target_date_obj < event_date:
+            return False
+
+        repeat_type = event.get("repeat_type") or "Не повторять"
+        interval = event.get("repeat_interval")
+        interval = int(interval) if interval is not None else 1
+
+        delta_days = (target_date_obj - event_date).days
+
+        if repeat_type == "Не повторять":
+            return event_date == target_date_obj
+
+        elif repeat_type == "Дни":
+            return delta_days % interval == 0
+
+        elif repeat_type == "Недели":
+            return delta_days % (interval * 7) == 0
+
+        elif repeat_type == "Месяцы":
+            delta_months = (target_date_obj.year
+                            - event_date.year) * 12 + (target_date_obj.month
+                                                       - event_date.month)
+            return delta_months % interval == 0 and target_date_obj.day == event_date.day
+
+        return False
+
     def get_events_by_date(self, target_date):
 
-        events = self.load_schedule()
+        try:
+            target_date_obj = datetime.strptime(target_date, "%Y-%m-%d").date()
+        except ValueError:
+            return []
 
-        return [
-            event
-            for event in events
-            if event["date"] == target_date
-        ]
+        all_events = self.load_schedule()
+        filtered_events = []
+
+        for event in all_events:
+            if self.should_show_event(event, target_date_obj):
+                filtered_events.append(event)
+
+        filtered_events.sort(key=lambda x: x.get("start_time", ""))
+
+        return filtered_events
