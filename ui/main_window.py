@@ -1,5 +1,5 @@
 from datetime import date
-from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation
+from PyQt6.QtCore import QDate, Qt, QTimer, QPropertyAnimation
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QWidget,
@@ -10,6 +10,9 @@ from PyQt6.QtWidgets import (
     QListWidget,
     QInputDialog,
     QMessageBox,
+    QLineEdit,
+    QComboBox,
+    QDateEdit
 )
 
 from ui.widgets.card import Card
@@ -89,23 +92,122 @@ class MainWindow(QWidget):
         root.addWidget(self.weather_card)
 
         # Расписание
-        self.schedule_text = QLabel(
-            "• Учёба: 08:30–11:50\n"
-            "• Работа: сегодня нет\n"
-            "• Спорт: 19:00–20:30"
+        self.schedule_text = QLabel()
+        self.add_event_button = QPushButton(
+            "+ Добавить событие"
         )
+
+        self.add_event_button.clicked.connect(
+            self.toggle_event_form
+        )
+        schedule_container = QWidget()
+
+        schedule_layout = QVBoxLayout(
+            schedule_container
+        )
+
+        schedule_layout.setContentsMargins(
+            0, 0, 0, 0
+        )
+
+        schedule_layout.addWidget(
+            self.schedule_text
+        )
+
+        schedule_layout.addWidget(
+            self.add_event_button
+        )
+
         self.schedule_text.setWordWrap(True)
         self.schedule_text.setObjectName("cardText")
 
-        self.schedule_button = QPushButton("Составить расписание")
-        self.schedule_button.clicked.connect(self.compose_schedule)
-
         self.schedule_card = Card(
             "Расписание",
-            body_widget=self.schedule_text,
-            header_right=self.schedule_button,
+            body_widget=schedule_container,
         )
         root.addWidget(self.schedule_card)
+
+        self.event_form = QWidget()
+
+        form_layout = QVBoxLayout(
+            self.event_form
+        )
+
+        self.event_title = QLineEdit()
+        self.event_title.setPlaceholderText(
+            "Название события"
+        )
+
+        self.event_type = QComboBox()
+
+        self.event_type.addItems([
+            "Учёба",
+            "Работа",
+            "Спорт",
+            "Другое"
+        ])
+
+        self.start_time = QLineEdit()
+        self.start_time.setPlaceholderText("08:30")
+
+        self.end_time = QLineEdit()
+        self.end_time.setPlaceholderText("10:00")
+
+        self.event_date = QDateEdit()
+
+        self.event_date.setCalendarPopup(True)
+        self.event_date.setDate(QDate.currentDate())
+
+        self.repeat_box = QComboBox()
+
+        self.repeat_box.addItems([
+            "Один раз",
+            "Ежедневно",
+            "Еженедельно",
+            "Ежемесячно"
+        ])
+
+        save_button = QPushButton(
+            "Сохранить событие"
+        )
+
+        save_button.clicked.connect(
+            self.save_event
+        )
+
+        form_layout.addWidget(
+            self.event_title
+        )
+
+        form_layout.addWidget(
+            self.event_type
+        )
+
+        form_layout.addWidget(
+            self.start_time
+        )
+
+        form_layout.addWidget(
+            self.end_time
+        )
+
+        form_layout.addWidget(
+            self.event_date
+        )
+
+        form_layout.addWidget(
+            self.repeat_box
+        )
+
+        form_layout.addWidget(
+            save_button
+        )
+
+        self.event_form.hide()
+
+        schedule_layout.addWidget(
+            self.event_form
+        )
 
         # Заметки
         self.notes_list = QListWidget()
@@ -265,12 +367,59 @@ class MainWindow(QWidget):
 
         for event in events:
 
+            icon = {
+                "Учёба": "📚",
+                "Работа": "💼",
+                "Спорт": "🏋️",
+                "Другое": "📌"
+            }.get(
+                event["type"],
+                "📌"
+            )
+
             lines.append(
-                f"{event['time']} • "
-                f"{event['title']} "
-                f"({event['type']})"
+                f"{icon} "
+                f"{event['start_time']}"
+                f"-"
+                f"{event['end_time']}  "
+                f"{event['title']}"
             )
 
         self.schedule_text.setText(
             "\n".join(lines)
         )
+
+    def toggle_event_form(self):
+
+        if self.event_form.isVisible():
+            self.event_form.hide()
+        else:
+            self.event_form.show()
+    
+    def save_event(self):
+
+        title = self.event_title.text().strip()
+
+        if not title:
+            return
+
+        self.schedule_service.add_event(
+            title=title,
+            start_time=self.start_time.text(),
+            end_time=self.end_time.text(),
+            event_type=self.event_type.currentText(),
+            event_date=self.event_date.date().toString(
+                "yyyy-MM-dd"
+            ),
+            repeat=self.repeat_box.currentText()
+        )
+
+        self.load_schedule()
+
+        self.event_title.clear()
+
+        self.start_time.clear()
+
+        self.end_time.clear()
+
+        self.event_form.hide()
