@@ -1,28 +1,44 @@
 from PyQt6.QtWidgets import (
-    QVBoxLayout,
-    QLabel,
     QFrame,
-    QGraphicsOpacityEffect
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QGraphicsOpacityEffect,
 )
 
 
 class Card(QFrame):
-    def __init__(self, title, content):
-        super().__init__()
+    def __init__(self, title, body_text="", body_widget=None, header_right=None, parent=None):
+        super().__init__(parent)
 
         self.setObjectName("card")
 
-        layout = QVBoxLayout(self)
+        root = QVBoxLayout(self)
+        root.setContentsMargins(18, 16, 18, 16)
+        root.setSpacing(10)
+
+        header = QHBoxLayout()
+        header.setSpacing(10)
 
         title_label = QLabel(title)
         title_label.setObjectName("cardTitle")
 
-        content_label = QLabel(content)
-        content_label.setWordWrap(True)
+        header.addWidget(title_label)
+        header.addStretch()
 
-        layout.addWidget(title_label)
-        layout.addWidget(content_label)
+        if header_right is not None:
+            header.addWidget(header_right)
 
-        self.opacity = QGraphicsOpacityEffect()
+        root.addLayout(header)
+
+        if body_widget is not None:
+            root.addWidget(body_widget)
+        else:
+            content_label = QLabel(body_text)
+            content_label.setWordWrap(True)
+            content_label.setObjectName("cardText")
+            root.addWidget(content_label)
+
+        self.opacity = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.opacity)
         self.opacity.setOpacity(0)
