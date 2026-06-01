@@ -15,7 +15,7 @@ class BriefService:
 
         weather = self.weather_service.get_weather()
 
-        if weather:
+        if isinstance(weather, dict):
 
             weather_type = weather["weather"][0]["main"]
 
