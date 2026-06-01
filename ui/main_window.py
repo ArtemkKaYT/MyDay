@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from PyQt6.QtCore import QDate, Qt, QTimer, QPropertyAnimation
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
@@ -12,7 +12,8 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QLineEdit,
     QComboBox,
-    QDateEdit
+    QDateEdit,
+    QSpinBox
 )
 
 from ui.widgets.card import Card
@@ -141,7 +142,7 @@ class MainWindow(QWidget):
         self.event_type = QComboBox()
 
         self.event_type.addItems([
-            "Учёба",
+            "Учеба",
             "Работа",
             "Спорт",
             "Другое"
@@ -158,14 +159,30 @@ class MainWindow(QWidget):
         self.event_date.setCalendarPopup(True)
         self.event_date.setDate(QDate.currentDate())
 
-        self.repeat_box = QComboBox()
+        self.repeat_type = QComboBox()
 
-        self.repeat_box.addItems([
-            "Один раз",
-            "Ежедневно",
-            "Еженедельно",
-            "Ежемесячно"
+        self.repeat_type.addItems([
+            "Не повторять",
+            "Дни",
+            "Недели",
+            "Месяцы"
         ])
+
+        self.repeat_interval = QSpinBox()
+
+        self.repeat_interval.setMinimum(1)
+        self.repeat_interval.setMaximum(365)
+        self.repeat_interval.setValue(1)
+
+        self.repeat_interval.hide()
+
+        def toggle_interval(text):
+            if text == "Не повторять":
+                self.repeat_interval.hide()
+            else:
+                self.repeat_interval.show()
+
+        self.repeat_type.currentTextChanged.connect(toggle_interval)
 
         save_button = QPushButton(
             "Сохранить событие"
@@ -196,7 +213,11 @@ class MainWindow(QWidget):
         )
 
         form_layout.addWidget(
-            self.repeat_box
+            self.repeat_type
+        )
+
+        form_layout.addWidget(
+            self.repeat_interval
         )
 
         form_layout.addWidget(
@@ -352,9 +373,7 @@ class MainWindow(QWidget):
     
     def load_schedule(self):
 
-        events = self.schedule_service.get_events_by_date(
-                                str(date.today())
-                            )
+        events = self.schedule_service.get_events_by_date(str(date.today()))
 
         if not events:
 
@@ -368,7 +387,7 @@ class MainWindow(QWidget):
         for event in events:
 
             icon = {
-                "Учёба": "📚",
+                "Учеба": "📚",
                 "Работа": "💼",
                 "Спорт": "🏋️",
                 "Другое": "📌"
@@ -411,7 +430,8 @@ class MainWindow(QWidget):
             event_date=self.event_date.date().toString(
                 "yyyy-MM-dd"
             ),
-            repeat=self.repeat_box.currentText()
+            repeat_type=self.repeat_type.currentText(),
+            repeat_interval=self.repeat_interval.value()
         )
 
         self.load_schedule()
