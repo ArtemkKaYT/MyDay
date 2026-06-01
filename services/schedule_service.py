@@ -16,7 +16,10 @@ class ScheduleService:
 
     def load_schedule(self):
         with open(self.file_path, "r", encoding="utf-8") as file:
-            return json.load(file)
+            try:
+                return json.load(file)
+            except json.JSONDecodeError:
+                return []
 
     def save_schedule(self, schedule):
         with open(self.file_path, "w", encoding="utf-8") as file:
