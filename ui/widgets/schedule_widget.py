@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QComboBox,
     QDateEdit,
-    QSpinBox
+    QSpinBox,
+    QLayout
 )
 from PyQt6.QtCore import QDate
 from ui.widgets.card import Card
@@ -21,6 +22,8 @@ class ScheduleWidget(Card):
         schedule_container = QWidget()
         schedule_layout = QVBoxLayout(schedule_container)
         schedule_layout.setContentsMargins(0, 0, 0, 0)
+
+        schedule_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinAndMaxSize)
 
         self.schedule_text = QLabel()
         self.schedule_text.setWordWrap(True)

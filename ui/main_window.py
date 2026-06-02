@@ -1,5 +1,5 @@
 from PyQt6.QtCore import QTimer, QPropertyAnimation
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea
 
 from ui.widgets.header_widget import HeaderWidget
 from ui.widgets.brief_widget import BriefWidget
@@ -32,30 +32,41 @@ class MainWindow(QWidget):
         self.animations = []
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(24, 24, 24, 24)
-        root.setSpacing(16)
+        root.setContentsMargins(0, 0, 0, 0)
+        
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        scroll_content = QWidget()
+        
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll_layout.setContentsMargins(24, 24, 24, 24)
+        scroll_layout.setSpacing(16)
 
         # Header widget
         self.header_widget = HeaderWidget()
-        root.addWidget(self.header_widget)
+        scroll_layout.addWidget(self.header_widget)
 
         # Brief widget
         self.brief_widget = BriefWidget(self.brief_service)
-        root.addWidget(self.brief_widget)
+        scroll_layout.addWidget(self.brief_widget)
 
         # Weather widget
         self.weather_widget = WeatherWidget(self.weather_service)
-        root.addWidget(self.weather_widget)
+        scroll_layout.addWidget(self.weather_widget)
 
         # Schedule widget
         self.schedule_widget = ScheduleWidget(self.schedule_service)
-        root.addWidget(self.schedule_widget)
+        scroll_layout.addWidget(self.schedule_widget)
 
         # Notes widget
         self.notes_widget = NotesWidget(self.notes_service)
-        root.addWidget(self.notes_widget)
+        scroll_layout.addWidget(self.notes_widget)
 
-        root.addStretch()
+        scroll_layout.addStretch()
+
+        scroll_area.setWidget(scroll_content)
+        root.addWidget(scroll_area)
 
         self.start_animations()
 
