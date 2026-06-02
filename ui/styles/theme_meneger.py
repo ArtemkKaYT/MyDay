@@ -87,7 +87,7 @@ def get_weather_theme(weather_main: str) -> str:
         QPushButton {{
             background-color: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            color: {cfg['accent']};
+            color: #E2E8F0;
             padding: 10px 16px;
             border-radius: 12px;
             font-weight: 600;
@@ -95,7 +95,7 @@ def get_weather_theme(weather_main: str) -> str:
 
         QPushButton:hover {{
             background-color: rgba(255, 255, 255, 0.08);
-            border: 1px solid {cfg['accent']};
+            border: 1px solid #E2E8F0;
         }}
 
         QPushButton:pressed {{
