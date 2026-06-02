@@ -35,7 +35,7 @@ class WeatherWidget(Card):
 
         if not isinstance(weather, dict):
             self.weather_text.setText(
-                "Не удалось получить погоду"
+                "Ошибка соединения с сервером погоды"
             )
             return
 
