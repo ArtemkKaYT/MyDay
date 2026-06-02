@@ -84,6 +84,90 @@ def get_weather_theme(weather_main: str) -> str:
             color: #A1A1AA;
         }}
 
+        #weatherIcon {{
+            font-size: 38px;
+            background-color: transparent;
+        }}
+
+        #weatherTemp {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background-color: transparent;
+        }}
+
+        #weatherStatus {{
+            font-size: 13px;
+            color: {cfg['accent']};
+            background-color: transparent;
+        }}
+
+        #eventIcon {{
+            font-size: 16px;
+            background-color: transparent;
+        }}
+
+        #eventTime {{
+            font-size: 14px;
+            font-weight: 600;
+            color: #71717A; /* Приглушенный серый для времени */
+            background-color: transparent;
+            min-width: 90px; /* Чтобы время всегда занимало одинаковую ширину */
+        }}
+
+        #eventTitle {{
+            font-size: 15px;
+            font-weight: 500;
+            color: #FFFFFF; /* Белый для самого события */
+            background-color: transparent;
+        }}
+
+        #noEventsLabel {{
+            color: #71717A;
+            font-style: italic;
+            padding: 8px 0;
+        }}
+
+        #noteRow {{
+            background-color: #1E1E24; /* Чуть светлее фона карточки */
+            border: 1px solid #2D2D34;
+            border-radius: 8px;
+        }}
+
+        #noteText {{
+            font-size: 14px;
+            color: #E4E4E7;
+            background-color: transparent;
+        }}
+
+        QCheckBox#noteCheckBox {{
+            spacing: 0px;
+            background-color: transparent;
+        }}
+
+        QCheckBox#noteCheckBox::indicator {{
+            width: 18px;
+            height: 18px;
+            border: 2px solid #52525B;
+            border-radius: 5px;
+            background-color: transparent;
+        }}
+
+        QCheckBox#noteCheckBox::indicator:hover {{
+            border-color: #A1A1AA;
+        }}
+
+        QCheckBox#noteCheckBox::indicator:checked {{
+            background-color: #10B981;
+            border-color: #10B981;
+        }}
+
+        #noNotesLabel {{
+            color: #71717A;
+            font-style: italic;
+            padding: 8px 0;
+        }}
+
         QPushButton {{
             background-color: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
