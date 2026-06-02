@@ -1,5 +1,5 @@
 from random import choice
-from datetime import date
+from datetime import date, datetime
 from config import WEATHER_MESSAGES
 
 
@@ -12,6 +12,20 @@ class BriefService:
     def generate_brief(self):
 
         parts = []
+
+        current_hour = datetime.now().hour
+
+        if 6 <= current_hour < 12:
+            parts.append("Доброе утро!")
+
+        elif 12 <= current_hour < 18:
+            parts.append("Добрый день!")
+
+        elif 18 <= current_hour < 24:
+            parts.append("Добрый вечер!")
+
+        else:
+            parts.append("Доброй ночи!")
 
         weather = self.weather_service.get_weather()
 
