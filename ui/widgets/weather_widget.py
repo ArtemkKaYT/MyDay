@@ -12,7 +12,7 @@ ENV_PATH = Path(".env")
 
 
 def read_env_settings():
-    settings = {"WEATHER_API_KEY": "", "CITY": "Петербург"}
+    settings = {"WEATHER_API_KEY": "", "CITY": "Saint Petersburg"}
     if ENV_PATH.exists():
         with open(ENV_PATH, "r", encoding="utf-8") as f:
             for line in f:
@@ -75,7 +75,7 @@ class WeatherSettingsDialog(QDialog):
         self.api_input.setPlaceholderText("Вставьте API ключ OpenWeather")
 
         self.city_input = QLineEdit()
-        self.city_input.setPlaceholderText("Например: Санкт-Петербург")
+        self.city_input.setPlaceholderText("Например: Saint Petersburg")
 
         form_layout.addRow("API Ключ:", self.api_input)
         form_layout.addRow("Город:", self.city_input)
