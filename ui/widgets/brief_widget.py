@@ -7,7 +7,7 @@ class BriefWidget(TypeWriterLabel):
         self.brief_service = brief_service
 
         brief_text = self.brief_service.generate_brief()
-        
+
         super().__init__(brief_text)
         self.setObjectName("briefLabel")
         self.setWordWrap(True)

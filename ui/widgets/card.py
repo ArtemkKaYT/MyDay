@@ -8,7 +8,13 @@ from PyQt6.QtWidgets import (
 
 
 class Card(QFrame):
-    def __init__(self, title, body_text="", body_widget=None, header_right=None, parent=None):
+    def __init__(self,
+                 title,
+                 body_text="",
+                 body_widget=None,
+                 header_right=None,
+                 parent=None
+                 ):
         super().__init__(parent)
 
         self.setObjectName("card")

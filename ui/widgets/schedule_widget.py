@@ -151,10 +151,10 @@ class ScheduleWidget(Card):
 
             icon_label = QLabel(icon)
             icon_label.setObjectName("eventIcon")
-            
+
             time_label = QLabel(f"{event['start_time']} – {event['end_time']}")
             time_label.setObjectName("eventTime")
-            
+
             title_label = QLabel(event["title"])
             title_label.setObjectName("eventTitle")
             title_label.setWordWrap(True)
@@ -171,7 +171,7 @@ class ScheduleWidget(Card):
             self.event_form.hide()
         else:
             self.event_form.show()
-    
+
     def save_event(self):
 
         title = self.event_title.text().strip()

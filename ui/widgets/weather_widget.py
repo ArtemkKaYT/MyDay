@@ -53,11 +53,10 @@ class WeatherWidget(Card):
             temp = round(weather["main"]["temp"])
             status = weather["weather"][0]["description"]
 
-            # ИСПРАВЛЕНИЕ: убираем \n и раскладываем текст по полочкам
             sign = "+" if temp > 0 else ""
-            
-            self.weather_text.setText(f"{sign}{temp}°C")    # Только температура
-            self.status_label.setText(status.capitalize()) # Меняет "Ясно" на актуальный статус (например, "Пасмурно")
+
+            self.weather_text.setText(f"{sign}{temp}°C")
+            self.status_label.setText(status.capitalize())
 
             weather_type = weather["weather"][0]["main"]
             self.update_weather_icon(weather_type)

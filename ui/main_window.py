@@ -50,12 +50,12 @@ class MainWindow(QWidget):
 
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
-        
+
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
 
         scroll_content = QWidget()
-        
+
         scroll_layout = QVBoxLayout(scroll_content)
         scroll_layout.setContentsMargins(24, 24, 24, 24)
         scroll_layout.setSpacing(16)
@@ -89,19 +89,19 @@ class MainWindow(QWidget):
 
     def load_weather_theme_async(self):
         self.weather_worker = WeatherFetchWorker(self.weather_service)
-        
+
         self.weather_worker.finished.connect(self.on_weather_loaded)
-        
+
         self.weather_worker.start()
 
     def on_weather_loaded(self, weather_data):
         try:
             weather_main = weather_data["weather"][0]["main"]
-            
+
             new_style = get_weather_theme(weather_main)
-            
+
             self.setStyleSheet(new_style)
-            
+
         except (KeyError, IndexError):
             pass
 
