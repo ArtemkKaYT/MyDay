@@ -12,7 +12,7 @@ PARAMS = {
 
 
 class WeatherService:
-    
+
     def get_weather(self):
         try:
             response = requests.get(WEATHER_URL, timeout=5, params=PARAMS)

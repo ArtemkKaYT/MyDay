@@ -39,7 +39,7 @@ class ScheduleService:
             event_date=None,
             repeat_type=None,
             repeat_interval=None
-        ):
+    ):
 
         schedule = self.load_schedule()
 
