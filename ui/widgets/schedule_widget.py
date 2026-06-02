@@ -1,5 +1,6 @@
 from datetime import date
 from PyQt6.QtWidgets import (
+    QHBoxLayout,
     QWidget,
     QVBoxLayout,
     QLabel,
@@ -25,18 +26,21 @@ class ScheduleWidget(Card):
 
         schedule_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinAndMaxSize)
 
-        self.schedule_text = QLabel()
-        self.schedule_text.setWordWrap(True)
-        self.schedule_text.setObjectName("cardText")
+        self.events_list_container = QWidget()
+        self.events_layout = QVBoxLayout(self.events_list_container)
+        self.events_layout.setContentsMargins(0, 0, 0, 0)
+        self.events_layout.setSpacing(8)
 
         self.add_event_button = QPushButton("+ Добавить событие")
         self.add_event_button.clicked.connect(self.toggle_event_form)
 
-        schedule_layout.addWidget(self.schedule_text)
+        schedule_layout.addWidget(self.events_list_container)
         schedule_layout.addWidget(self.add_event_button)
 
         self.event_form = QWidget()
         form_layout = QVBoxLayout(self.event_form)
+        form_layout.setContentsMargins(0, 8, 0, 0)
+        form_layout.setSpacing(8)
 
         self.event_title = QLineEdit()
         self.event_title.setPlaceholderText("Название события")
@@ -49,6 +53,11 @@ class ScheduleWidget(Card):
             "Другое"
         ])
 
+        time_row = QWidget()
+        time_layout = QHBoxLayout(time_row)
+        time_layout.setContentsMargins(0, 0, 0, 0)
+        time_layout.setSpacing(8)
+
         self.start_time = QLineEdit()
         self.start_time.setPlaceholderText("08:30")
 
@@ -58,6 +67,11 @@ class ScheduleWidget(Card):
         self.event_date = QDateEdit()
         self.event_date.setCalendarPopup(True)
         self.event_date.setDate(QDate.currentDate())
+
+        repeat_row = QWidget()
+        repeat_layout = QHBoxLayout(repeat_row)
+        repeat_layout.setContentsMargins(0, 0, 0, 0)
+        repeat_layout.setSpacing(8)
 
         self.repeat_type = QComboBox()
         self.repeat_type.addItems([
@@ -84,13 +98,17 @@ class ScheduleWidget(Card):
         save_button = QPushButton("Сохранить событие")
         save_button.clicked.connect(self.save_event)
 
+        time_layout.addWidget(self.start_time)
+        time_layout.addWidget(self.end_time)
+
+        repeat_layout.addWidget(self.repeat_type)
+        repeat_layout.addWidget(self.repeat_interval)
+
         form_layout.addWidget(self.event_title)
         form_layout.addWidget(self.event_type)
-        form_layout.addWidget(self.start_time)
-        form_layout.addWidget(self.end_time)
+        form_layout.addWidget(time_row)
         form_layout.addWidget(self.event_date)
-        form_layout.addWidget(self.repeat_type)
-        form_layout.addWidget(self.repeat_interval)
+        form_layout.addWidget(repeat_row)
         form_layout.addWidget(save_button)
 
         self.event_form.hide()
@@ -100,42 +118,52 @@ class ScheduleWidget(Card):
 
         self.load_schedule()
 
+    def clear_events_layout(self):
+        while self.events_layout.count():
+            item = self.events_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
     def load_schedule(self):
+        self.clear_events_layout()
 
         events = self.schedule_service.get_events_by_date(str(date.today()))
 
         if not events:
-
-            self.schedule_text.setText(
-                "Сегодня событий нет"
-            )
+            no_events_label = QLabel("Сегодня событий нет")
+            no_events_label.setObjectName("noEventsLabel")
+            self.events_layout.addWidget(no_events_label)
             return
 
-        lines = []
-
         for event in events:
-
             icon = {
                 "Учеба": "📚",
                 "Работа": "💼",
                 "Спорт": "🏋️",
                 "Другое": "📌"
-            }.get(
-                event["type"],
-                "📌"
-            )
+            }.get(event["type"], "📌")
 
-            lines.append(
-                f"{icon} "
-                f"{event['start_time']}"
-                f"-"
-                f"{event['end_time']}  "
-                f"{event['title']}"
-            )
+            row_widget = QWidget()
+            row_layout = QHBoxLayout(row_widget)
+            row_layout.setContentsMargins(0, 4, 0, 4)
+            row_layout.setSpacing(12)
 
-        self.schedule_text.setText(
-            "\n".join(lines)
-        )
+            icon_label = QLabel(icon)
+            icon_label.setObjectName("eventIcon")
+            
+            time_label = QLabel(f"{event['start_time']} – {event['end_time']}")
+            time_label.setObjectName("eventTime")
+            
+            title_label = QLabel(event["title"])
+            title_label.setObjectName("eventTitle")
+            title_label.setWordWrap(True)
+
+            row_layout.addWidget(icon_label)
+            row_layout.addWidget(time_label)
+            row_layout.addWidget(title_label, stretch=1)
+
+            self.events_layout.addWidget(row_widget)
 
     def toggle_event_form(self):
 
