@@ -7,7 +7,6 @@ from ui.styles.dark_theme import DARK_THEME
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyleSheet(DARK_THEME)
 
     window = MainWindow()
     window.show()

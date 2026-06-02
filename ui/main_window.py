@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QTimer, QPropertyAnimation
+from PyQt6.QtCore import QTimer, QPropertyAnimation, QThread, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea
 
 from ui.widgets.header_widget import HeaderWidget
@@ -11,6 +11,21 @@ from services.weather_service import WeatherService
 from services.schedule_service import ScheduleService
 from services.notes_service import NotesService
 from services.brief_service import BriefService
+
+from ui.styles.theme_meneger import get_weather_theme
+
+
+class WeatherFetchWorker(QThread):
+    finished = pyqtSignal(dict)
+
+    def __init__(self, weather_service):
+        super().__init__()
+        self.weather_service = weather_service
+
+    def run(self):
+        data = self.weather_service.get_weather()
+        if data:
+            self.finished.emit(data)
 
 
 class MainWindow(QWidget):
@@ -30,6 +45,8 @@ class MainWindow(QWidget):
         self.resize(720, 860)
 
         self.animations = []
+
+        self.setStyleSheet(get_weather_theme("Clouds"))
 
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -69,6 +86,24 @@ class MainWindow(QWidget):
         root.addWidget(scroll_area)
 
         self.start_animations()
+
+    def load_weather_theme_async(self):
+        self.weather_worker = WeatherFetchWorker(self.weather_service)
+        
+        self.weather_worker.finished.connect(self.on_weather_loaded)
+        
+        self.weather_worker.start()
+
+    def on_weather_loaded(self, weather_data):
+        try:
+            weather_main = weather_data["weather"][0]["main"]
+            
+            new_style = get_weather_theme(weather_main)
+            
+            self.setStyleSheet(new_style)
+            
+        except (KeyError, IndexError):
+            pass
 
     def start_animations(self):
         QTimer.singleShot(300, self.brief_widget.start_animation)
