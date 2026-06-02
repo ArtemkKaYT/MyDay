@@ -55,12 +55,6 @@ class MainWindow(QWidget):
         self.notes_widget = NotesWidget(self.notes_service)
         root.addWidget(self.notes_widget)
 
-        # Кнопка добавить заметку
-        self.add_note_button = QPushButton("Добавить заметку")
-        self.add_note_button.clicked.connect(self.notes_widget.add_note)
-
-        root.addWidget(self.add_note_button)
-
         root.addStretch()
 
         self.start_animations()

@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QListWidget,
     QPushButton,
-    QInputDialog
+    QLineEdit
 )
 from ui.widgets.card import Card
 from services.notes_service import NotesService
@@ -18,11 +18,58 @@ class NotesWidget(Card):
         notes_layout.setContentsMargins(0, 0, 0, 0)
 
         self.notes_list = QListWidget()
+
         notes_layout.addWidget(self.notes_list)
+
+        self.add_note_button = QPushButton(
+            "+ Добавить заметку"
+        )
+        self.add_note_button.clicked.connect(
+            self.toggle_note_form
+        )
+
+        notes_layout.addWidget(
+            self.add_note_button
+        )
+
+        self.note_form = QWidget()
+        form_layout = QVBoxLayout(self.note_form)
+
+        self.note_input = QLineEdit()
+        self.note_input.setPlaceholderText(
+            "Введите заметку"
+        )
+
+        save_button = QPushButton(
+            "Сохранить заметку"
+        )
+        save_button.clicked.connect(
+            self.add_note
+        )
+
+        form_layout.addWidget(
+            self.note_input
+        )
+        form_layout.addWidget(
+            save_button
+        )
+
+        self.note_form.hide()
+
+        notes_layout.addWidget(
+            self.note_form
+        )
 
         super().__init__("Заметки", body_widget=notes_container)
 
         self.load_notes()
+    
+    def toggle_note_form(self):
+
+        if self.note_form.isVisible():
+            self.note_form.hide()
+        else:
+            self.note_form.show()
 
     def load_notes(self):
 
@@ -37,16 +84,17 @@ class NotesWidget(Card):
 
     def add_note(self):
 
-        text, ok = QInputDialog.getText(
-            self,
-            "Добавить заметку",
-            "Введите заметку:"
+        text = self.note_input.text().strip()
+
+        if not text:
+            return
+
+        self.notes_service.add_note(
+            text
         )
 
-        if ok and text.strip():
+        self.load_notes()
 
-            self.notes_service.add_note(
-                text.strip()
-            )
+        self.note_input.clear()
 
-            self.load_notes()
+        self.note_form.hide()
