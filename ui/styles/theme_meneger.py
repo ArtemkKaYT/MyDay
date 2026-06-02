@@ -216,4 +216,18 @@ def get_weather_theme(weather_main: str) -> str:
             border-radius: 4px;
             min-height: 40px;
         }}
+
+        #weatherSettingsBtn {{
+            background-color: transparent;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #71717A;
+            padding: 2px;
+        }}
+
+        #weatherSettingsBtn:hover {{
+            color: #FFFFFF;
+            background-color: #27272A;
+        }}
     """
