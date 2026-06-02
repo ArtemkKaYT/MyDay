@@ -72,6 +72,10 @@ class MainWindow(QWidget):
         self.weather_widget = WeatherWidget(self.weather_service)
         scroll_layout.addWidget(self.weather_widget)
 
+        self.weather_widget.settings_changed.connect(self.load_weather_theme_async)
+
+        scroll_layout.addWidget(self.weather_widget)
+
         # Schedule widget
         self.schedule_widget = ScheduleWidget(self.schedule_service)
         scroll_layout.addWidget(self.schedule_widget)
@@ -84,6 +88,8 @@ class MainWindow(QWidget):
 
         scroll_area.setWidget(scroll_content)
         root.addWidget(scroll_area)
+
+        self.load_weather_theme_async()
 
         self.start_animations()
 

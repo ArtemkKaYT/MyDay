@@ -1,10 +1,16 @@
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
-WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
-CITY = os.getenv("CITY")
+def get_weather_api_key():
+    load_dotenv(override=True)
+    return os.getenv("WEATHER_API_KEY", "")
+
+
+def get_city():
+    load_dotenv(override=True)
+    return os.getenv("CITY", "Saint Petersburg")
+
 
 WEATHER_MESSAGES = {
         "Clear": [

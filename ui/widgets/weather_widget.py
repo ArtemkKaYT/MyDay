@@ -1,11 +1,114 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel
+from pathlib import Path
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import (
+    QVBoxLayout, QWidget, QHBoxLayout, QLabel,
+    QPushButton, QDialog, QFormLayout, QLineEdit, QDialogButtonBox
+)
 from ui.widgets.card import Card
 from services.weather_service import WeatherService
 
 
+ENV_PATH = Path(".env")
+
+
+def read_env_settings():
+    settings = {"WEATHER_API_KEY": "", "CITY": "Петербург"}
+    if ENV_PATH.exists():
+        with open(ENV_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                if "=" in line and not line.strip().startswith("#"):
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k in settings:
+                        settings[k] = v
+    return settings
+
+def write_env_settings(api_key, city):
+    lines = []
+    keys_updated = {"WEATHER_API_KEY": False, "CITY": False}
+    
+    if ENV_PATH.exists():
+        with open(ENV_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                if "=" in line and not line.strip().startswith("#"):
+                    k, _ = line.split("=", 1)
+                    k = k.strip()
+
+                    if k == "WEATHER_API_KEY":
+                        lines.append(f"WEATHER_API_KEY='{api_key}'\n")
+                        keys_updated["WEATHER_API_KEY"] = True
+                        continue
+                    elif k == "CITY":
+                        lines.append(f"CITY='{city}'\n")
+                        keys_updated["CITY"] = True
+                        continue
+
+                lines.append(line)
+
+    if lines and not lines[-1].endswith("\n"):
+        lines[-1] += "\n"
+
+    if not keys_updated["WEATHER_API_KEY"]:
+        lines.append(f"WEATHER_API_KEY='{api_key}'\n")
+    if not keys_updated["CITY"]:
+        lines.append(f"CITY='{city}'\n")
+
+    with open(ENV_PATH, "w", encoding="utf-8") as f:
+        f.writelines(lines)
+
+
+class WeatherSettingsDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Настройки погоды")
+        self.setModal(True)
+        self.setFixedWidth(320)
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+
+        form_layout = QFormLayout()
+        form_layout.setSpacing(8)
+
+        self.api_input = QLineEdit()
+        self.api_input.setPlaceholderText("Вставьте API ключ OpenWeather")
+
+        self.city_input = QLineEdit()
+        self.city_input.setPlaceholderText("Например: Санкт-Петербург")
+
+        form_layout.addRow("API Ключ:", self.api_input)
+        form_layout.addRow("Город:", self.city_input)
+        layout.addLayout(form_layout)
+
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Save |
+            QDialogButtonBox.StandardButton.Cancel
+        )
+        self.button_box.accepted.connect(self.save_and_close)
+        self.button_box.rejected.connect(self.reject)
+        layout.addWidget(self.button_box)
+
+        self.load_current_settings()
+
+    def load_current_settings(self):
+        data = read_env_settings()
+        self.api_input.setText(data["WEATHER_API_KEY"])
+        self.city_input.setText(data["CITY"])
+
+    def save_and_close(self):
+        api = self.api_input.text().strip()
+        city = self.city_input.text().strip()
+        if not city:
+            city = "Saint Petersburg"
+
+        write_env_settings(api, city)
+        self.accept()
+
+
 class WeatherWidget(Card):
+    settings_changed = pyqtSignal()
+
     def __init__(self, weather_service: WeatherService):
         self.weather_service = weather_service
 
@@ -15,6 +118,7 @@ class WeatherWidget(Card):
         weather_layout.setSpacing(14)
 
         self.weather_icon = QLabel("☀️")
+        self.weather_icon.setFixedWidth(50)
         self.weather_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.weather_icon.setObjectName("weatherIcon")
 
@@ -33,13 +137,24 @@ class WeatherWidget(Card):
         text_layout.addWidget(self.weather_text)
         text_layout.addWidget(self.status_label)
 
+        self.settings_button = QPushButton("⚙️")
+        self.settings_button.setObjectName("weatherSettingsBtn")
+        self.settings_button.setFixedSize(26, 26)
+        self.settings_button.clicked.connect(self.open_settings)
+
         weather_layout.addWidget(self.weather_icon)
         weather_layout.addWidget(text_container)
         weather_layout.addStretch()
+        weather_layout.addWidget(self.settings_button)
 
         super().__init__("Погода", body_widget=weather_body)
-
         self.load_weather()
+
+    def open_settings(self):
+        dialog = WeatherSettingsDialog(self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_weather()
+            self.settings_changed.emit()
 
     def load_weather(self):
         weather = self.weather_service.get_weather()
@@ -66,15 +181,8 @@ class WeatherWidget(Card):
             self.status_label.setText("Ошибка данных")
 
     def update_weather_icon(self, weather_type):
-
         icons = {
-            "Clear": "☀️",
-            "Clouds": "☁️",
-            "Rain": "🌧️",
-            "Snow": "❄️",
-            "Thunderstorm": "⛈️"
+            "Clear": "☀️", "Clouds": "☁️", "Rain": "🌧️",
+            "Snow": "❄️", "Thunderstorm": "⛈️"
         }
-
-        self.weather_icon.setText(
-            icons.get(weather_type, "🌤️")
-        )
+        self.weather_icon.setText(icons.get(weather_type, "🌤️"))

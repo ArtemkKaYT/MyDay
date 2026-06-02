@@ -1,21 +1,24 @@
 import requests
-from config import WEATHER_API_KEY, CITY
-
+import config
 
 WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather'
-PARAMS = {
-        'q': CITY,
-        'appid': WEATHER_API_KEY,
-        'units': 'metric',
-        'lang': 'ru'
-    }
 
 
 class WeatherService:
 
     def get_weather(self):
+        params = {
+            'q': config.get_city(),
+            'appid': config.get_weather_api_key(),
+            'units': 'metric',
+            'lang': 'ru'
+        }
+
+        if not params['appid']:
+            return None
+
         try:
-            response = requests.get(WEATHER_URL, timeout=5, params=PARAMS)
+            response = requests.get(WEATHER_URL, timeout=5, params=params)
             response.raise_for_status()
             return response.json()
 
