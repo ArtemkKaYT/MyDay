@@ -49,7 +49,7 @@ class BriefService:
         study_events = [
             event
             for event in events
-            if event["type"] == "Учёба"
+            if event["type"] == "Учеба"
         ]
 
         work_events = [
