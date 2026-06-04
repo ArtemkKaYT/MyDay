@@ -3,9 +3,9 @@ from pathlib import Path
 from datetime import date, datetime
 
 
-class ScheduleService:
+class ScheduleService:  # Сервис для работы с расписанием событий
 
-    def __init__(self, file_path="data/schedule.json"):
+    def __init__(self, file_path="data/schedule.json"):  # Инициализация с путем к JSON файлу
         self.file_path = Path(file_path)
 
         if not self.file_path.exists():
@@ -14,14 +14,14 @@ class ScheduleService:
             with open(self.file_path, "w", encoding="utf-8") as file:
                 json.dump([], file, ensure_ascii=False, indent=4)
 
-    def load_schedule(self):
+    def load_schedule(self):  # Загружает события из файла
         with open(self.file_path, "r", encoding="utf-8") as file:
             try:
                 return json.load(file)
             except json.JSONDecodeError:
                 return []
 
-    def save_schedule(self, schedule):
+    def save_schedule(self, schedule):  # Сохраняет события в файл
         with open(self.file_path, "w", encoding="utf-8") as file:
             json.dump(
                 schedule,
@@ -30,7 +30,7 @@ class ScheduleService:
                 indent=4
             )
 
-    def add_event(
+    def add_event(  # Добавляет новое событие с параметрами
             self,
             title,
             start_time,
@@ -60,20 +60,17 @@ class ScheduleService:
 
         self.save_schedule(schedule)
 
-    def delete_event(self, index):
-
+    def delete_event(self, index):  # Удаляет событие по индексу
         schedule = self.load_schedule()
 
         if 0 <= index < len(schedule):
             schedule.pop(index)
             self.save_schedule(schedule)
 
-    def get_events(self):
-
+    def get_events(self):  # Возвращает все события
         return self.load_schedule()
 
-    def should_show_event(self, event, target_date_obj):
-
+    def should_show_event(self, event, target_date_obj):  # Проверяет, должно ли событие отображаться в конкретную дату
         try:
             event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
         except (KeyError, ValueError):
@@ -105,8 +102,7 @@ class ScheduleService:
 
         return False
 
-    def get_events_by_date(self, target_date):
-
+    def get_events_by_date(self, target_date):  # Возвращает события для конкретной даты с учетом повторений
         try:
             target_date_obj = datetime.strptime(target_date, "%Y-%m-%d").date()
         except ValueError:
