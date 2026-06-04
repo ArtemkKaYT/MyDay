@@ -7,8 +7,8 @@ from PyQt6.QtWidgets import (
 )
 
 
-class Card(QFrame):
-    def __init__(self,
+class Card(QFrame):  # Карточка с заголовком, телом и эффектом прозрачности
+    def __init__(self,  # Создает карточку с возможностью кастомного виджета или текста
                  title,
                  body_text="",
                  body_widget=None,
@@ -37,6 +37,7 @@ class Card(QFrame):
 
         root.addLayout(header)
 
+        # Добавляем тело карточки (виджет или текст)
         if body_widget is not None:
             root.addWidget(body_widget)
         else:
@@ -45,6 +46,7 @@ class Card(QFrame):
             content_label.setObjectName("cardText")
             root.addWidget(content_label)
 
+        # Эффект для анимации появления
         self.opacity = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.opacity)
         self.opacity.setOpacity(0)
