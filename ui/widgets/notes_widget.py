@@ -13,8 +13,8 @@ from ui.widgets.card import Card
 from services.notes_service import NotesService
 
 
-class NotesWidget(Card):
-    def __init__(self, notes_service: NotesService):
+class NotesWidget(Card):  # Виджет для отображения и управления заметками
+    def __init__(self, notes_service: NotesService):  # Принимает сервис заметок
         self.notes_service = notes_service
 
         notes_container = QWidget()
@@ -56,17 +56,17 @@ class NotesWidget(Card):
         super().__init__("Заметки", body_widget=notes_container)
         self.load_notes()
 
-    def toggle_note_form(self):
+    def toggle_note_form(self):  # Показывает/скрывает форму добавления заметки
         self.note_form.setVisible(not self.note_form.isVisible())
 
-    def clear_notes_layout(self):
+    def clear_notes_layout(self):  # Очищает список заметок
         while self.notes_list_layout.count():
             item = self.notes_list_layout.takeAt(0)
             widget = item.widget()
             if widget:
                 widget.deleteLater()
 
-    def load_notes(self):
+    def load_notes(self):  # Загружает и отображает все заметки из сервиса
         self.clear_notes_layout()
         notes = self.notes_service.get_notes()
 
@@ -96,7 +96,7 @@ class NotesWidget(Card):
 
             self.notes_list_layout.addWidget(row_widget)
 
-    def add_note(self):
+    def add_note(self):  # Добавляет новую заметку из поля ввода
         text = self.note_input.text().strip()
         if not text:
             return
@@ -106,6 +106,6 @@ class NotesWidget(Card):
         self.note_input.clear()
         self.note_form.hide()
 
-    def delete_note(self, note_id):
+    def delete_note(self, note_id):  # Удаляет заметку по ID
         self.notes_service.delete_note(note_id)
         self.load_notes()
