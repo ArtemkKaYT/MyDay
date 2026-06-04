@@ -1,24 +1,76 @@
 """
-@file theme_meneger.py
-@brief Module of MyDay project.
+Модуль сервиса для генерации ежедневной сводки (Brief Service).
+
+Этот модуль предоставляет функциональность для создания персональной
+ежедневной сводки, которая включает:
+
+- Приветствие в зависимости от времени суток
+- Мотивирующее сообщение о текущей погоде
+- Информацию о предстоящих событиях дня
+- Интеллектуальные советы на основе расписания
+
+Сервис объединяет данные из сервисов погоды и расписания
+для создания единой информативной сводки.
+
+Пример:
+    Использование BriefService::
+
+        from services.brief_service import BriefService
+        from services.weather_service import WeatherService
+        from services.schedule_service import ScheduleService
+
+        weather_service = WeatherService()
+        schedule_service = ScheduleService()
+        
+        brief_service = BriefService(weather_service, schedule_service)
+        svodka = brief_service.generate_brief()
+        print(svodka)
 """
+
 from random import choice
 from datetime import date, datetime
 from config import WEATHER_MESSAGES
 
 
-class BriefService:  # Сервис для генерации приветствия и сводки дня
+class BriefService:
+    """
+    Сервис для генерации персональной ежедневной сводки.
 
-    def __init__(self, weather_service, schedule_service):  # Принимает сервисы погоды и расписания
+    Этот класс создаёт информативное текстовое резюме дня на основе
+    времени суток, информации о погоде и расписания событий пользователя.
+
+    Атрибуты:
+        weather_service (WeatherService): Сервис для получения данных о погоде.
+        schedule_service (ScheduleService): Сервис для получения данных о расписании.
+    """
+
+    def __init__(self, weather_service, schedule_service):
+        """
+        Инициализация BriefService.
+
+        Аргументы:
+            weather_service (WeatherService): Экземпляр сервиса погоды.
+            schedule_service (ScheduleService): Экземпляр сервиса расписания.
+        """
         self.weather_service = weather_service
         self.schedule_service = schedule_service
 
-    def generate_brief(self):  # Формирует текстовую сводку на основе времени, погоды и событий
+    def generate_brief(self):
+        """
+        Сгенерировать ежедневную сводку.
+
+        Формирует текстовую сводку дня, объединяя приветствие
+        в зависимости от времени суток, информацию о погоде,
+        и краткое описание событий из расписания на сегодня.
+
+        Возвращает:
+            str: Сформированная сводка дня на русском языке.
+        """
         parts = []
 
         current_hour = datetime.now().hour
 
-        # Определяем время суток
+        # Определяем время суток для приветствия
         if 6 <= current_hour < 12:
             parts.append("Доброе утро!")
 
@@ -31,7 +83,7 @@ class BriefService:  # Сервис для генерации приветств
         else:
             parts.append("Доброй ночи!")
 
-        # Добавляем сообщение о погоде
+        # Добавляем мотивирующее сообщение о погоде
         weather = self.weather_service.get_weather()
 
         if isinstance(weather, dict):
@@ -47,6 +99,7 @@ class BriefService:  # Сервис для генерации приветств
 
         today = str(date.today())
 
+        # Получаем события на сегодня
         events = self.schedule_service.get_events_by_date(
             today
         )

@@ -1,15 +1,67 @@
 """
-@file theme_meneger.py
-@brief Module of MyDay project.
+Модуль сервиса расписания (Schedule Service) для приложения MyDay.
+
+Этот модуль предоставляет функциональность управления расписанием и событиями, включая:
+
+- Создание, чтение, обновление и удаление событий
+- Поддержка повторяющихся событий (ежедневно, еженедельно, ежемесячно)
+- Фильтрацию событий по дате с учётом логики повторений
+- Персистентное хранилище на базе JSON файлов
+
+Класс ScheduleService управляет всеми операциями, связанными с расписанием,
+и обрабатывает паттерны повторения событий для гибкого планирования.
+
+Пример:
+    Использование ScheduleService::
+
+        from services.schedule_service import ScheduleService
+
+        service = ScheduleService()
+        service.add_event(
+            title='Встреча',
+            start_time='14:00',
+            end_time='15:00',
+            event_type='Работа'
+        )
+        events = service.get_events_by_date('2024-06-04')
+
+Атрибуты:
+    ScheduleService: Основной класс сервиса управления расписанием
 """
+
 import json
 from pathlib import Path
 from datetime import date, datetime
 
 
-class ScheduleService:  # Сервис для работы с расписанием событий
+class ScheduleService:
+    """
+    Сервис для управления событиями и операциями расписания.
 
-    def __init__(self, file_path="data/schedule.json"):  # Инициализация с путем к JSON файлу
+    Этот класс обеспечивает полный функционал работы с событиями,
+    включая создание, удаление, загрузку, сохранение и поиск событий.
+    Поддерживает повторяющиеся события с различными паттернами повторения
+    (ежедневно, еженедельно, ежемесячно).
+
+    События хранятся в JSON формате и включают поддержку:
+    - Названия события, даты и времени
+    - Категоризации события (Работа, Учеба, Спорт и т.д.)
+    - Паттернов повторения и интервалов
+
+    Атрибуты:
+        file_path (Path): Путь к JSON файлу для хранения событий
+    """
+
+    def __init__(self, file_path="data/schedule.json"):
+        """
+        Инициализация ScheduleService с JSON файлом хранилища.
+
+        Создаёт файл хранилища и директории, если они не существуют.
+
+        Аргументы:
+            file_path (str, optional): Путь к JSON файлу. По умолчанию
+                'data/schedule.json'.
+        """
         self.file_path = Path(file_path)
 
         if not self.file_path.exists():
@@ -18,14 +70,27 @@ class ScheduleService:  # Сервис для работы с расписани
             with open(self.file_path, "w", encoding="utf-8") as file:
                 json.dump([], file, ensure_ascii=False, indent=4)
 
-    def load_schedule(self):  # Загружает события из файла
+    def load_schedule(self):
+        """
+        Загрузить все события из JSON файла хранилища.
+
+        Возвращает:
+            list: Список всех событий. Возвращает пустой список если
+                  JSON файл некорректен или повреждён.
+        """
         with open(self.file_path, "r", encoding="utf-8") as file:
             try:
                 return json.load(file)
             except json.JSONDecodeError:
                 return []
 
-    def save_schedule(self, schedule):  # Сохраняет события в файл
+    def save_schedule(self, schedule):
+        """
+        Сохранить события в JSON файл хранилища.
+
+        Аргументы:
+            schedule (list): Список словарей событий для сохранения.
+        """
         with open(self.file_path, "w", encoding="utf-8") as file:
             json.dump(
                 schedule,
@@ -34,7 +99,7 @@ class ScheduleService:  # Сервис для работы с расписани
                 indent=4
             )
 
-    def add_event(  # Добавляет новое событие с параметрами
+    def add_event(
             self,
             title,
             start_time,
@@ -44,7 +109,39 @@ class ScheduleService:  # Сервис для работы с расписани
             repeat_type=None,
             repeat_interval=None
     ):
+        """
+        Добавить новое событие в расписание.
 
+        Создаёт новое событие с указанными параметрами и сохраняет
+        его в файл хранилища.
+
+        Аргументы:
+            title (str): Название/описание события.
+            start_time (str): Время начала события в формате HH:MM.
+            end_time (str): Время завершения события в формате HH:MM.
+            event_type (str): Категория события (например, 'Работа', 'Учеба', 'Спорт').
+            event_date (str, optional): Дата события в формате YYYY-MM-DD.
+                По умолчанию используется текущая дата.
+            repeat_type (str, optional): Паттерн повторения. Может быть:
+                - 'Не повторять' (без повторения, по умолчанию)
+                - 'Дни' (ежедневно)
+                - 'Недели' (еженедельно)
+                - 'Месяцы' (ежемесячно)
+            repeat_interval (int, optional): Интервал повторения
+                (например, 2 означает каждые 2 дня/недели/месяца).
+
+        Пример:
+            Добавление повторяющегося события работы::
+
+                service.add_event(
+                    title='Встреча с командой',
+                    start_time='10:00',
+                    end_time='11:00',
+                    event_type='Работа',
+                    repeat_type='Недели',
+                    repeat_interval=1
+                )
+        """
         schedule = self.load_schedule()
 
         if event_date is None:
@@ -64,17 +161,51 @@ class ScheduleService:  # Сервис для работы с расписани
 
         self.save_schedule(schedule)
 
-    def delete_event(self, index):  # Удаляет событие по индексу
+    def delete_event(self, index):
+        """
+        Удалить событие по его индексу в расписании.
+
+        Аргументы:
+            index (int): Нулевой индекс события для удаления.
+
+        Возвращает:
+            None
+        """
         schedule = self.load_schedule()
 
         if 0 <= index < len(schedule):
             schedule.pop(index)
             self.save_schedule(schedule)
 
-    def get_events(self):  # Возвращает все события
+    def get_events(self):
+        """
+        Получить все события в расписании.
+
+        Возвращает:
+            list: Список всех словарей событий.
+        """
         return self.load_schedule()
 
-    def should_show_event(self, event, target_date_obj):  # Проверяет, должно ли событие отображаться в конкретную дату
+    def should_show_event(self, event, target_date_obj):
+        """
+        Определить, должно ли событие отображаться в указанную дату.
+
+        Проверяет, появляется ли событие с правилами повторения
+        в целевую дату. Обрабатывает непрерывные, ежедневные,
+        еженедельные и ежемесячные паттерны повторения.
+
+        Аргументы:
+            event (dict): Словарь события с информацией о дате и повторении.
+            target_date_obj (date): Дата для проверки.
+
+        Возвращает:
+            bool: True если событие должно отображаться в target_date_obj,
+                  False в противном случае.
+
+        Примечание:
+            - Для ежемесячного повторения проверяется совпадение дня
+            - Дни считаются от даты начала события
+        """
         try:
             event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
         except (KeyError, ValueError):
@@ -106,7 +237,31 @@ class ScheduleService:  # Сервис для работы с расписани
 
         return False
 
-    def get_events_by_date(self, target_date):  # Возвращает события для конкретной даты с учетом повторений
+    def get_events_by_date(self, target_date):
+        """
+        Получить все события на конкретную дату, включая повторяющиеся.
+
+        Получает события, которые приходятся на указанную дату,
+        учитывая паттерны повторяющихся событий. Результаты сортируются
+        по времени начала.
+
+        Аргументы:
+            target_date (str): Дата в формате YYYY-MM-DD.
+
+        Возвращает:
+            list: Список словарей событий для целевой даты,
+                  отсортированные по start_time. Возвращает пустой список если
+                  формат даты некорректен.
+
+        Пример:
+            Получение событий на сегодня::
+
+                from datetime import date
+                today = str(date.today())
+                events = service.get_events_by_date(today)
+                for event in events:
+                    print(f"{event['title']}: {event['start_time']}")
+        """
         try:
             target_date_obj = datetime.strptime(target_date, "%Y-%m-%d").date()
         except ValueError:
