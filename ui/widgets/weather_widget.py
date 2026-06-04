@@ -11,7 +11,7 @@ from services.weather_service import WeatherService
 ENV_PATH = Path(".env")
 
 
-def read_env_settings():
+def read_env_settings():  # Читает API ключ и город из .env
     settings = {"WEATHER_API_KEY": "", "CITY": "Saint Petersburg"}
     if ENV_PATH.exists():
         with open(ENV_PATH, "r", encoding="utf-8") as f:
@@ -24,7 +24,7 @@ def read_env_settings():
                         settings[k] = v
     return settings
 
-def write_env_settings(api_key, city):
+def write_env_settings(api_key, city):  # Сохраняет настройки в .env файл
     lines = []
     keys_updated = {"WEATHER_API_KEY": False, "CITY": False}
     
@@ -58,7 +58,7 @@ def write_env_settings(api_key, city):
         f.writelines(lines)
 
 
-class WeatherSettingsDialog(QDialog):
+class WeatherSettingsDialog(QDialog):  # Диалоговое окно настроек погоды
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Настройки погоды")
@@ -91,12 +91,12 @@ class WeatherSettingsDialog(QDialog):
 
         self.load_current_settings()
 
-    def load_current_settings(self):
+    def load_current_settings(self):  # Загружает текущие настройки в поля
         data = read_env_settings()
         self.api_input.setText(data["WEATHER_API_KEY"])
         self.city_input.setText(data["CITY"])
 
-    def save_and_close(self):
+    def save_and_close(self):  # Сохраняет настройки и закрывает диалог
         api = self.api_input.text().strip()
         city = self.city_input.text().strip()
         if not city:
@@ -106,7 +106,7 @@ class WeatherSettingsDialog(QDialog):
         self.accept()
 
 
-class WeatherWidget(Card):
+class WeatherWidget(Card):  # Виджет отображения погоды
     settings_changed = pyqtSignal()
 
     def __init__(self, weather_service: WeatherService):
@@ -150,13 +150,13 @@ class WeatherWidget(Card):
         super().__init__("Погода", body_widget=weather_body)
         self.load_weather()
 
-    def open_settings(self):
+    def open_settings(self):  # Открывает диалог настроек
         dialog = WeatherSettingsDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.load_weather()
             self.settings_changed.emit()
 
-    def load_weather(self):
+    def load_weather(self):  # Загружает и отображает текущую погоду
         weather = self.weather_service.get_weather()
 
         if not isinstance(weather, dict):
@@ -180,7 +180,7 @@ class WeatherWidget(Card):
             self.weather_text.setText("--")
             self.status_label.setText("Ошибка данных")
 
-    def update_weather_icon(self, weather_type):
+    def update_weather_icon(self, weather_type):  # Обновляет иконку по типу погоды
         icons = {
             "Clear": "☀️", "Clouds": "☁️", "Rain": "🌧️",
             "Snow": "❄️", "Thunderstorm": "⛈️"
