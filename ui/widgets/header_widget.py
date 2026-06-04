@@ -4,7 +4,7 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 
-class HeaderWidget(QWidget):
+class HeaderWidget(QWidget):  # Виджет с часами и датой в шапке
     def __init__(self):
         super().__init__()
 
@@ -24,13 +24,13 @@ class HeaderWidget(QWidget):
 
         self.setup_clock()
 
-    def setup_clock(self):
+    def setup_clock(self):  # Запускает таймер для обновления времени
         self.clock_timer = QTimer(self)
         self.clock_timer.timeout.connect(self.update_time)
         self.clock_timer.start(1000)
         self.update_time()
 
-    def update_time(self):
+    def update_time(self):  # Обновляет время и дату каждую секунду
         now = datetime.now()
 
         self.time_label.setText(now.strftime("%H:%M"))
