@@ -1,3 +1,7 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
 from random import choice
 from datetime import date, datetime
 from config import WEATHER_MESSAGES
