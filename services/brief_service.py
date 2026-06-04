@@ -3,18 +3,18 @@ from datetime import date, datetime
 from config import WEATHER_MESSAGES
 
 
-class BriefService:
+class BriefService:  # Сервис для генерации приветствия и сводки дня
 
-    def __init__(self, weather_service, schedule_service):
+    def __init__(self, weather_service, schedule_service):  # Принимает сервисы погоды и расписания
         self.weather_service = weather_service
         self.schedule_service = schedule_service
 
-    def generate_brief(self):
-
+    def generate_brief(self):  # Формирует текстовую сводку на основе времени, погоды и событий
         parts = []
 
         current_hour = datetime.now().hour
 
+        # Определяем время суток
         if 6 <= current_hour < 12:
             parts.append("Доброе утро!")
 
@@ -27,6 +27,7 @@ class BriefService:
         else:
             parts.append("Доброй ночи!")
 
+        # Добавляем сообщение о погоде
         weather = self.weather_service.get_weather()
 
         if isinstance(weather, dict):
@@ -46,6 +47,7 @@ class BriefService:
             today
         )
 
+        # Фильтруем события по типам
         study_events = [
             event
             for event in events
@@ -64,12 +66,14 @@ class BriefService:
             if event["type"] == "Спорт"
         ]
 
+        # Добавляем информацию об учебе
         if study_events:
 
             parts.append(
                 f"Сегодня {len(study_events)} учебных занятия."
             )
 
+        # Добавляем информацию о работе
         if work_events:
 
             start = min(
@@ -86,12 +90,14 @@ class BriefService:
                 f"Работа с {start} до {finish}."
             )
 
+        # Добавляем информацию о спорте
         if sport_events:
 
             parts.append(
                 "Сегодня есть тренировка. Не забудь позаниматься!"
             )
 
+        # Сценарии для пустого расписания
         if not events:
 
             parts.append(
