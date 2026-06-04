@@ -1,3 +1,8 @@
+"""
+@file config.py
+@brief Module of MyDay project.
+"""
+
 from dotenv import load_dotenv
 import os
 
