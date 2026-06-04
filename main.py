@@ -1,3 +1,8 @@
+"""
+@file main.py
+@brief Module of MyDay project.
+"""
+
 import sys
 from PyQt6.QtWidgets import QApplication
 
