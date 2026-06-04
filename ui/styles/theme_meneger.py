@@ -1,3 +1,8 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
+
 def get_weather_theme(weather_main: str) -> str:  # Возвращает CSS стиль в зависимости от погоды
     THEMES = {  # Словарь с цветовыми схемами для типов погоды
         "Clear": {
