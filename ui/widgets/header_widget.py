@@ -1,3 +1,7 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
 from datetime import datetime
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
