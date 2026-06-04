@@ -2,8 +2,8 @@ from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QLabel
 
 
-class TypeWriterLabel(QLabel):
-    def __init__(self, text="", speed=30):
+class TypeWriterLabel(QLabel):  # Виджет с анимацией печати текста
+    def __init__(self, text="", speed=30):  # Принимает текст и скорость печати
         super().__init__()
 
         self.full_text = text
@@ -15,12 +15,12 @@ class TypeWriterLabel(QLabel):
 
         self.speed = speed
 
-    def start(self):
+    def start(self):  # Запускает анимацию печати
         self.current_text = ""
         self.index = 0
         self.timer.start(self.speed)
 
-    def update_text(self):
+    def update_text(self):  # Добавляет один символ за тик таймера
         if self.index < len(self.full_text):
             self.current_text += self.full_text[self.index]
             self.setText(self.current_text)
