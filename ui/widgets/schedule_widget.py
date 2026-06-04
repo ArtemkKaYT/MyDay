@@ -1,3 +1,7 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
 from datetime import date
 from PyQt6.QtWidgets import (
     QHBoxLayout,
