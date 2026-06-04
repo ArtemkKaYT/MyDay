@@ -1,3 +1,7 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QLabel
 
