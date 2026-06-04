@@ -1,3 +1,7 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
 from ui.widgets.type_writer_label import TypeWriterLabel
 from services.brief_service import BriefService
 
