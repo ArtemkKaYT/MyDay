@@ -1,5 +1,5 @@
-def get_weather_theme(weather_main: str) -> str:
-    THEMES = {
+def get_weather_theme(weather_main: str) -> str:  # Возвращает CSS стиль в зависимости от погоды
+    THEMES = {  # Словарь с цветовыми схемами для типов погоды
         "Clear": {
             "bg": "qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #1A263E, stop:0.5 #11141A, stop:1 #2D2214)",
             "card": "#161A24",
@@ -32,12 +32,13 @@ def get_weather_theme(weather_main: str) -> str:
         }
     }
 
+    # Для тумана используем Default_Mist
     if weather_main in ["Mist", "Fog", "Haze", "Smoke"]:
         cfg = THEMES["Default_Mist"]
     else:
         cfg = THEMES.get(weather_main, THEMES["Clouds"])
 
-    return f"""
+    return f"""  # Формируем строку со стилями CSS
         QWidget {{
             background-color: {cfg['bg']};
             color: #E2E8F0;
