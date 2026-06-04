@@ -15,21 +15,21 @@ from services.brief_service import BriefService
 from ui.styles.theme_meneger import get_weather_theme
 
 
-class WeatherFetchWorker(QThread):
+class WeatherFetchWorker(QThread):  # Поток для асинхронной загрузки погоды
     finished = pyqtSignal(dict)
 
-    def __init__(self, weather_service):
+    def __init__(self, weather_service):  # Принимает сервис погоды
         super().__init__()
         self.weather_service = weather_service
 
-    def run(self):
+    def run(self):  # Запускается в отдельном потоке
         data = self.weather_service.get_weather()
         if data:
             self.finished.emit(data)
 
 
-class MainWindow(QWidget):
-    def __init__(self):
+class MainWindow(QWidget):  # Главное окно приложения MyDay
+    def __init__(self):  # Инициализация всех виджетов и сервисов
         super().__init__()
 
         self.weather_service = WeatherService()
@@ -93,14 +93,14 @@ class MainWindow(QWidget):
 
         self.start_animations()
 
-    def load_weather_theme_async(self):
+    def load_weather_theme_async(self):  # Асинхронно загружает погоду и меняет тему
         self.weather_worker = WeatherFetchWorker(self.weather_service)
 
         self.weather_worker.finished.connect(self.on_weather_loaded)
 
         self.weather_worker.start()
 
-    def on_weather_loaded(self, weather_data):
+    def on_weather_loaded(self, weather_data):  # Обрабатывает полученные данные погоды
         try:
             weather_main = weather_data["weather"][0]["main"]
 
@@ -111,7 +111,7 @@ class MainWindow(QWidget):
         except (KeyError, IndexError):
             pass
 
-    def start_animations(self):
+    def start_animations(self):  # Запускает анимации появления виджетов
         QTimer.singleShot(300, self.brief_widget.start_animation)
 
         cards = [self.weather_widget, self.schedule_widget, self.notes_widget]
