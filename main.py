@@ -1,16 +1,16 @@
 import sys
-from PyQt6.QtWidgets import QApplication  # Главный класс приложения, управляет циклом событий
+from PyQt6.QtWidgets import QApplication
 
-from ui.main_window import MainWindow  # Класс главного окна
+from ui.main_window import MainWindow
 
 
-def main():
-    app = QApplication(sys.argv)  # Создаёт объект приложения (обязательный шаг)
+def main():  # Точка входа
+    app = QApplication(sys.argv)
 
-    window = MainWindow()  # Создаёт экземпляр главного окна
-    window.show()  # Отображает окно на экране
+    window = MainWindow()
+    window.show()
 
-    sys.exit(app.exec())  # Запускает главный цикл обработки событий
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
