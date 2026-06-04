@@ -16,8 +16,8 @@ from ui.widgets.card import Card
 from services.schedule_service import ScheduleService
 
 
-class ScheduleWidget(Card):
-    def __init__(self, schedule_service: ScheduleService):
+class ScheduleWidget(Card):  # Виджет для отображения и управления расписанием
+    def __init__(self, schedule_service: ScheduleService):  # Принимает сервис расписания
         self.schedule_service = schedule_service
 
         schedule_container = QWidget()
@@ -87,7 +87,7 @@ class ScheduleWidget(Card):
         self.repeat_interval.setValue(1)
         self.repeat_interval.hide()
 
-        def toggle_interval(text):
+        def toggle_interval(text):  # Показывает интервал если повторяется
             if text == "Не повторять":
                 self.repeat_interval.hide()
             else:
@@ -118,14 +118,14 @@ class ScheduleWidget(Card):
 
         self.load_schedule()
 
-    def clear_events_layout(self):
+    def clear_events_layout(self):  # Очищает список событий
         while self.events_layout.count():
             item = self.events_layout.takeAt(0)
             widget = item.widget()
             if widget:
                 widget.deleteLater()
 
-    def load_schedule(self):
+    def load_schedule(self):  # Загружает события на сегодня с иконками
         self.clear_events_layout()
 
         events = self.schedule_service.get_events_by_date(str(date.today()))
@@ -165,15 +165,13 @@ class ScheduleWidget(Card):
 
             self.events_layout.addWidget(row_widget)
 
-    def toggle_event_form(self):
-
+    def toggle_event_form(self):  # Показывает/скрывает форму добавления события
         if self.event_form.isVisible():
             self.event_form.hide()
         else:
             self.event_form.show()
 
-    def save_event(self):
-
+    def save_event(self):  # Сохраняет новое событие и обновляет список
         title = self.event_title.text().strip()
 
         if not title:
@@ -194,9 +192,6 @@ class ScheduleWidget(Card):
         self.load_schedule()
 
         self.event_title.clear()
-
         self.start_time.clear()
-
         self.end_time.clear()
-
         self.event_form.hide()
