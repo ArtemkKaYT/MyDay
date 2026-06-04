@@ -1,3 +1,7 @@
+"""
+@file theme_meneger.py
+@brief Module of MyDay project.
+"""
 import json
 from pathlib import Path
 from datetime import date, datetime
